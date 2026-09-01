@@ -17,5 +17,9 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
+[project.scripts]
+recode_h5ad = "recode_h5ad.main:main"
+
 [project.urls]
-Homepage = "https://github.com"
+Homepage = "https://github.com/GabrielHoffman/recode_h5ad"
+

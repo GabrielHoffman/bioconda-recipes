@@ -3,7 +3,7 @@ Name: recode_h5ad
 Version: 0.1.0
 Summary: Recode H5AD file changing sparsity format and cell sorting
 Author-email: Gabriel Hoffman <gabriel.hoffman@gmail.com>
-Project-URL: Homepage, https://github.com
+Project-URL: Homepage, https://github.com/GabrielHoffman/recode_h5ad
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: OS Independent

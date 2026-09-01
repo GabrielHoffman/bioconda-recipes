@@ -1,0 +1,2 @@
+[console_scripts]
+recode_h5ad = recode_h5ad.main:main
