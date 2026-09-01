@@ -1,0 +1,7 @@
+pyproject.toml
+src/recode_h5ad/__init__.py
+src/recode_h5ad/core.py
+src/recode_h5ad.egg-info/PKG-INFO
+src/recode_h5ad.egg-info/SOURCES.txt
+src/recode_h5ad.egg-info/dependency_links.txt
+src/recode_h5ad.egg-info/top_level.txt
