@@ -53,7 +53,7 @@ Now, we convert an H5AD file to CSC (i.e. gene-major) format, sorting the cells 
 # H5AD=(Original H5AD file)
 # OUTFILE=(New H5AD file)
 
-recode_h5ad.py \
+recode_h5ad \
   --input $H5AD \
   --sortBy class,subclass,SampleID \
   --format CSC \
