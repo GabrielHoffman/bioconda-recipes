@@ -30,7 +30,7 @@ def main():
   parser.add_argument("--output",      
       type=Path, 
       required=True,
-      help="Output .h5ad file")
+      help="Output .h5ad or .zarr file")
 
   parser.add_argument("--ondisk", 
       action="store_true",
@@ -42,9 +42,9 @@ def main():
 
   parser.add_argument(
       "--compression",
-      default=None,
+      default="zstd",
       choices=[None, "None", "gzip", "lzf", "zstd"],
-      help="Optional compression for output file (gzip, lzf, zstd). Default: None")
+      help="Optional compression for output file (gzip, lzf, zstd). Default: zstd")
 
   parser.add_argument(
       "--format",
@@ -67,6 +67,11 @@ def main():
       help="(streaming mode only) Number of nonzeros per HDF5 read in pass 1. "
            "Default: 8000000")
 
+  parser.add_argument("--zarrFormat",
+      type=int, default=2,
+      help="Format version 2 or 3 "
+           "Default: 2")
+
   # parse args
   args = parser.parse_args()
 
@@ -78,7 +83,7 @@ def main():
   if args.compression == "None":
     args.compression = None
 
-  print("Script version:", "0.1.3")
+  print("Script version:", "0.1.4")
 
   version = importlib.metadata.version("anndata")
   print("AnnData version:", version) 
@@ -86,6 +91,14 @@ def main():
   if parse(version) >= parse("0.13.0"):
     # for compatibility with anndataR
     ad.settings.allow_write_nullable_strings = False
+
+  if args.output.suffix.endswith(".h5ad"):
+    print("Output format: h5ad")
+  elif args.output.suffix.endswith(".zarr"):
+    print("Output format: zarr")
+  else:
+      print("Output fill must end with .h5ad or .zarr")
+      sys.exit(2)     
 
   # read file
   if backed:
@@ -272,14 +285,22 @@ def main():
   if args.output.is_file():
     args.output.unlink(missing_ok=True)
 
-  print("Writing H5AD...") 
 
   compressMethod = args.compression
 
   if compressMethod == "zstd":
     compressMethod = hdf5plugin.FILTERS["zstd"]
 
-  adata.write_h5ad( args.output, compression=compressMethod )
+  if args.output.suffix.endswith(".h5ad"):
+    print("Writing H5AD...") 
+    adata.write_h5ad( args.output, compression=compressMethod )
+  elif args.output.suffix.endswith(".zarr"):    
+    print("Writing Zarr...") 
+    ad.settings.zarr_write_format = args.zarrFormat
+    adata.write_zarr( args.output )
+  else:       
+      print(f"Output fill must end with .h5ad or .zarr")
+      sys.exit(2)     
 
 
 
