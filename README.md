@@ -11,10 +11,10 @@ The result is a valid H5AD file supported by standard tools, but just optimized 
 Here, we download the script and examine the arguments:
 
 ```sh
-recode_h5ad -h
-usage: main.py [-h] --input INPUT --output OUTPUT [--ondisk] [--sortBy SORTBY]
-               [--compression {None,None,gzip,lzf,zstd}] [--format {CSR,CSC}]
-               [--noLibSize] [--colBlock COLBLOCK] [--valueChunk VALUECHUNK]
+usage: recode_h5ad [-h] --input INPUT --output OUTPUT [--ondisk]
+                   [--sortBy SORTBY] [--compression {None,None,gzip,lzf,zstd}]
+                   [--format {CSR,CSC}] [--noLibSize] [--colBlock COLBLOCK]
+                   [--valueChunk VALUECHUNK] [--zarrFormat ZARRFORMAT]
 
 Convert an AnnData .h5ad file so that X (and raw/X) is stored in CSC sparse
 format (v 0.1.3)
@@ -22,25 +22,26 @@ format (v 0.1.3)
 options:
   -h, --help            show this help message and exit
   --input INPUT         Input .h5ad file
-  --output OUTPUT       Output .h5ad file
+  --output OUTPUT       Output .h5ad or .zarr file
   --ondisk              Use file-backed mode to stream data into memory in
                         chunks to reduce maximum memory usage
   --sortBy SORTBY       Cols to sort by in _decreasing_ order of importance
   --compression {None,None,gzip,lzf,zstd}
-                        Optional compression for output file (gzip, lzf, zstd).
-                        Default: None
+                        Optional compression for output file (gzip, lzf,
+                        zstd). Default: zstd
   --format {CSR,CSC}    Store sparse count matrix (X and raw/X) in CSR or CSC
                         format. CSR allows faster access to cells, CSC gives
                         faster access to genes. Default: CSR
   --noLibSize           Skip computing libSize for each cell
   --colBlock COLBLOCK   (streaming mode only) Number of destination-major
                         columns processed per pass. Lower = less peak memory,
-                        more passes. For very large h5ads tune down (e.g. 16 or
-                        8). Default: 64
+                        more passes. For very large h5ads tune down (e.g. 16
+                        or 8). Default: 64
   --valueChunk VALUECHUNK
                         (streaming mode only) Number of nonzeros per HDF5 read
                         in pass 1. Default: 8000000
-
+  --zarrFormat ZARRFORMAT
+                        Format version 2 or 3 Default: 2
 ```
 
 ### Example

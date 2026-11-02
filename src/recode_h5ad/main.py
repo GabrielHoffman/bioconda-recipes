@@ -72,6 +72,12 @@ def main():
       help="Format version 2 or 3 "
            "Default: 2")
 
+  parser.add_argument("--chunk",
+      nargs=2,
+      type=int, default=None,
+      help="Number of cells and genes per chunk. " 
+           "Default: None")
+
   # parse args
   args = parser.parse_args()
 
@@ -83,7 +89,7 @@ def main():
   if args.compression == "None":
     args.compression = None
 
-  print("Script version:", "0.1.4")
+  print("Script version:", "0.1.5")
 
   version = importlib.metadata.version("anndata")
   print("AnnData version:", version) 
@@ -228,63 +234,8 @@ def main():
         raw.X = sp.csr_matrix(raw.X)
         adata.raw = raw
 
-  # if args.format == "CSC":
-
-  #   if not args.noLibSize or not sp.isspmatrix_csc(adata.X):
-  #     if backed is None:
-  #       adata = adata.copy()
-  #     else:
-  #       adata = adata.to_memory()
-
-  #   if not args.noLibSize:
-  #     # compute library size for each cell
-  #     print("Compute libSize...")
-  #     if adata.raw is not None:
-  #       adata.obs['libSize'] = adata.raw.X.sum(axis=1)
-  #     else:
-  #       adata.obs['libSize'] = adata.X.sum(axis=1)
-
-  #   # if matrix is not a CSC of doubles
-  #   if not (sp.isspmatrix_csc(adata.X) and adata.X.dtype == np.float64):
-  #     print("Converting .X to CSC sparse format...")
-  #     # convert matrix type
-  #     adata.X = sp.csc_matrix(adata.X, dtype=np.float64)
-
-  #     if adata.raw is not None:
-  #       print("Converting .row.X to CSC sparse format...")
-  #       raw = adata.raw.to_adata()
-  #       raw.X = sp.csc_matrix(raw.X, dtype=np.float64)
-  #       adata.raw = raw
-
-  # if args.format == "CSR":
-  #   # X
-  #   if not sp.isspmatrix_csr(adata.X):
-  #     print("Converting .X to CSR sparse format...")
-  #     if backed is None:
-  #       adata = adata.copy()
-  #     else:
-  #       adata = adata.to_memory()
-      
-  #     # convert matrix type
-  #     adata.X = sp.csr_matrix(adata.X, dtype=np.float64)
-
-  #     if adata.raw is not None:
-  #       print("Converting .row.X to CSR sparse format...")
-  #       raw = adata.raw.to_adata()
-  #       raw.X = sp.csr_matrix(raw.X, dtype=np.float64)
-  #       adata.raw = raw
-
-  #     if not args.noLibSize:
-  #       # compute library size for each cell
-  #       print("Compute libSize...")
-  #       if adata.raw is not None:
-  #         adata.obs['libSize'] = adata.raw.X.sum(axis=1)
-  #       else:
-  #         adata.obs['libSize'] = adata.X.sum(axis=1)
-
   if args.output.is_file():
     args.output.unlink(missing_ok=True)
-
 
   compressMethod = args.compression
 
@@ -297,7 +248,12 @@ def main():
   elif args.output.suffix.endswith(".zarr"):    
     print("Writing Zarr...") 
     ad.settings.zarr_write_format = args.zarrFormat
-    adata.write_zarr( args.output )
+    ad.settings.auto_shard_zarr_v3 = False 
+
+    # (cells_per_chunk, genes_per_chunk) )
+    adata.write_zarr( args.output,
+        chunks=args.chunk)
+
   else:       
       print(f"Output fill must end with .h5ad or .zarr")
       sys.exit(2)     
